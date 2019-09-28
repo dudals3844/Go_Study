@@ -1,47 +1,36 @@
 package main
 
 import (
-	//"fmt"
+	"fmt"
 	//"math"
 	//"log"
-	"os"
+	//"os"
 	//"time"
 	//"sync"
-	"io"
+	"io/ioutil"
+	"net/http"
 )
 
 func main() {
-	fi, err := os.Open("/workspace/go/src/github.com/demo-apps/go-gin-app/Go_Study/src/1.txt")
-	if err != nil {
-		panic(err)
-	}
-	defer fi.Close()
-
-	//create ouput file
-	fo, err := os.Create("/workspace/go/src/github.com/demo-apps/go-gin-app/Go_Study/src/2.txt")
+	//Create request obj
+	req, err := http.NewRequest("GET", "http://csharp.tips/feed/rss",nil)
 	if err != nil{
 		panic(err)
 	}
-	defer fo.Close()
-	buff := make([]byte, 1024)
+	req.Header.Add("User-Agent","Crawler")
 
-	//loop
-	for {
-		cnt, err := fi.Read(buff)
-		if err != nil && err != io.EOF {
-			panic(err)
-		}
-
-		if cnt == 0{
-			break
-		}
-
-		//write
-		_, err = fo.Write(buff[:cnt])
-		if err != nil{
-			panic(err)
-		}
+	//Client obj start request
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		panic(err)
 	}
+	defer resp.Body.Close()
+
+	//print result
+	bytes,_ := ioutil.ReadAll(resp.Body)
+	str := string(bytes)
+	fmt.Println(str)
 }
 
 
